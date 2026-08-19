@@ -1,5 +1,5 @@
 /* Fluxo · Service Worker — cache-first para uso 100% offline */
-const CACHE = 'fluxo-v2';
+const CACHE = 'fluxo-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -16,6 +16,9 @@ const ASSETS = [
   './fonts/space-mono-latin-400-normal.woff2',
   './fonts/space-mono-latin-700-normal.woff2'
 ];
+
+// Permite que a página peça a ativação imediata da versão nova
+self.addEventListener('message', e => { if (e.data === 'skipWaiting') self.skipWaiting(); });
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -45,4 +48,3 @@ self.addEventListener('fetch', e => {
     })
   );
 });
- 

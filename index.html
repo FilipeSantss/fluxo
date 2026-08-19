@@ -1,897 +1,161 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0B0B12">
-<title>Fluxo · Controle Financeiro</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="favicon.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Fluxo">
-<meta name="mobile-web-app-capable" content="yes">
-<style>
-  @font-face{font-family:'Space Grotesk';font-weight:400;font-display:swap;src:url('fonts/space-grotesk-latin-400-normal.woff2') format('woff2')}
-  @font-face{font-family:'Space Grotesk';font-weight:500;font-display:swap;src:url('fonts/space-grotesk-latin-500-normal.woff2') format('woff2')}
-  @font-face{font-family:'Space Grotesk';font-weight:600;font-display:swap;src:url('fonts/space-grotesk-latin-600-normal.woff2') format('woff2')}
-  @font-face{font-family:'Space Grotesk';font-weight:700;font-display:swap;src:url('fonts/space-grotesk-latin-700-normal.woff2') format('woff2')}
-  @font-face{font-family:'Space Mono';font-weight:400;font-display:swap;src:url('fonts/space-mono-latin-400-normal.woff2') format('woff2')}
-  @font-face{font-family:'Space Mono';font-weight:700;font-display:swap;src:url('fonts/space-mono-latin-700-normal.woff2') format('woff2')}
-
-  :root{
-    --bg:#0B0B12;--surface:#15151F;--surface-2:#1D1D2B;--line:#2A2A3C;
-    --violet:#B14EFF;--cyan:#22D3EE;--mint:#34F5C5;--pink:#FF4D8D;--amber:#FFB020;
-    --text:#ECECF5;--muted:#83839A;--muted-2:#5A5A72;
-    --display:'Space Grotesk',sans-serif;--mono:'Space Mono',monospace;
-    --safe-b:env(safe-area-inset-bottom,0px);
-  }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%}
-  body{font-family:var(--display);background:#050508;color:var(--text);display:flex;align-items:center;justify-content:center;min-height:100dvh}
-
-  .stage{width:100%;min-height:100dvh;display:flex;align-items:center;justify-content:center}
-  .device{width:100%;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
-  @media(min-width:480px){
-    .stage{padding:28px}
-    .device{width:392px;height:820px;max-height:92vh;border-radius:44px;border:1px solid #262636;
-      box-shadow:0 0 0 11px #0e0e16,0 0 0 12px #2a2a3c,0 40px 90px -20px rgba(177,78,255,.28),0 30px 60px rgba(0,0,0,.7)}
-    .device::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:130px;height:26px;background:#050508;border-radius:0 0 16px 16px;z-index:60}
-  }
-  .app{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden}
-  .app::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
-    background:radial-gradient(60% 40% at 85% 0%,rgba(177,78,255,.16),transparent 60%),radial-gradient(50% 35% at 0% 8%,rgba(34,211,238,.12),transparent 55%)}
-  .scroll{position:relative;z-index:1;flex:1;overflow-y:auto;overflow-x:hidden;padding:0 18px 120px;-webkit-overflow-scrolling:touch}
-  .scroll::-webkit-scrollbar{display:none}
-
-  .top{display:flex;align-items:center;justify-content:space-between;padding:54px 2px 14px}
-  @media(min-width:480px){.top{padding:44px 2px 14px}}
-  .hi-label{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-  .hi-name{font-size:22px;font-weight:700;margin-top:2px;letter-spacing:-.5px}
-  .avatar{width:44px;height:44px;border-radius:14px;flex:none;background:linear-gradient(135deg,var(--violet),var(--cyan));display:grid;place-items:center;font-weight:700;font-size:16px;color:#0B0B12;box-shadow:0 8px 22px -6px rgba(177,78,255,.6)}
-
-  .month{display:flex;align-items:center;justify-content:center;gap:14px;margin:4px 0 18px;font-family:var(--mono)}
-  .month button{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1}
-  .month button:active{color:var(--violet)}
-  .month span{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--text);min-width:150px;text-align:center}
-
-  .balance{position:relative;border-radius:26px;padding:24px 22px 22px;overflow:hidden;background:linear-gradient(150deg,#1b0f2e 0%,#14141f 55%,#0d1a20 100%);border:1px solid #2c2340;box-shadow:0 24px 50px -24px rgba(177,78,255,.5)}
-  .balance::after{content:"";position:absolute;top:-40%;right:-20%;width:70%;height:120%;background:radial-gradient(circle,rgba(34,211,238,.22),transparent 65%);pointer-events:none}
-  .balance .lbl{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-  .balance .amount{font-family:var(--mono);font-weight:700;font-size:40px;margin-top:8px;letter-spacing:-1px;line-height:1;display:flex;align-items:baseline;gap:6px}
-  .balance .amount .cents{font-size:22px;color:var(--muted)}
-  .balance .sub{margin-top:10px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
-  .chip{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:8px;background:rgba(52,245,197,.12);color:var(--mint);border:1px solid rgba(52,245,197,.25)}
-  .chip.neg{background:rgba(255,77,141,.12);color:var(--pink);border-color:rgba(255,77,141,.25)}
-  .spark{margin-top:18px}
-  .spark .cap{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted-2);margin-bottom:6px}
-  .spark svg{width:100%;height:44px;display:block}
-
-  .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-  .stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 15px}
-  .stat .row{display:flex;align-items:center;gap:8px}
-  .dot{width:9px;height:9px;border-radius:50%}
-  .dot.in{background:var(--mint);box-shadow:0 0 10px var(--mint)}
-  .dot.out{background:var(--pink);box-shadow:0 0 10px var(--pink)}
-  .stat .t{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
-  .stat .v{font-family:var(--mono);font-weight:700;font-size:19px;margin-top:8px;letter-spacing:-.5px}
-  .stat .v.in{color:var(--mint)}.stat .v.out{color:var(--pink)}
-
-  .sec-head{display:flex;align-items:center;justify-content:space-between;margin:26px 2px 12px}
-  .sec-head h2{font-size:15px;font-weight:600;letter-spacing:-.3px}
-  .sec-head a{font-family:var(--mono);font-size:11px;color:var(--cyan);text-decoration:none;letter-spacing:.5px;cursor:pointer}
-
-  .cats{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;gap:18px;align-items:center}
-  .donut{position:relative;width:132px;height:132px;flex:none}
-  .donut .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-  .donut .center .pct{font-family:var(--mono);font-weight:700;font-size:22px;line-height:1}
-  .donut .center .nm{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:3px;max-width:78px}
-  .legend{flex:1;display:flex;flex-direction:column;gap:9px;min-width:0}
-  .leg{display:flex;align-items:center;gap:9px;cursor:pointer;padding:2px 0;border-radius:8px}
-  .leg .ld{width:10px;height:10px;border-radius:3px;flex:none}
-  .leg .ln{font-size:12.5px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
-  .leg .lv{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
-  .leg.active .ln{color:#fff}.leg.dim{opacity:.4}
-
-  .tx{display:flex;align-items:center;gap:13px;padding:13px 2px;border-bottom:1px solid rgba(42,42,60,.55);position:relative}
-  .tx:last-child{border-bottom:none}
-  .tx .ic{width:42px;height:42px;border-radius:13px;flex:none;display:grid;place-items:center;font-size:18px;background:var(--surface-2);border:1px solid var(--line)}
-  .tx .mid{flex:1;min-width:0}
-  .tx .nm{font-size:14.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tx .meta{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:3px;letter-spacing:.4px}
-  .tx .amt{font-family:var(--mono);font-weight:700;font-size:15px;flex:none;letter-spacing:-.3px}
-  .tx .amt.in{color:var(--mint)}.tx .amt.out{color:var(--text)}
-  .tx .del{position:absolute;right:0;top:50%;transform:translateY(-50%) scale(.9);opacity:0;background:rgba(255,77,141,.14);color:var(--pink);border:none;border-radius:10px;width:34px;height:34px;font-size:16px;cursor:pointer;transition:.15s}
-  .tx.show-del .amt{opacity:0}.tx.show-del .del{opacity:1;transform:translateY(-50%) scale(1)}
-
-  .empty{text-align:center;padding:38px 20px;color:var(--muted)}
-  .empty .em{font-size:30px;margin-bottom:10px}
-  .empty p{font-size:13px;line-height:1.6}
-
-  .fab{position:absolute;z-index:40;right:20px;bottom:calc(94px + var(--safe-b));width:60px;height:60px;border-radius:20px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--violet),var(--cyan));color:#0B0B12;font-size:30px;font-weight:700;display:grid;place-items:center;line-height:1;box-shadow:0 14px 30px -8px rgba(177,78,255,.65);transition:transform .12s}
-  .fab:active{transform:scale(.92)}
-
-  .tabbar{position:absolute;z-index:35;left:0;right:0;bottom:0;padding:10px 8px calc(12px + var(--safe-b));display:flex;justify-content:space-around;align-items:center;background:linear-gradient(to top,rgba(11,11,18,.98) 65%,rgba(11,11,18,0));backdrop-filter:blur(12px)}
-  .tab{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-2);padding:6px 10px;font-family:var(--mono)}
-  .tab svg{width:23px;height:23px}
-  .tab span{font-size:8.5px;letter-spacing:.4px;text-transform:uppercase}
-  .tab.active{color:var(--violet)}
-  .tab.active svg{filter:drop-shadow(0 0 6px rgba(177,78,255,.6))}
-
-  .backdrop{position:absolute;inset:0;z-index:70;background:rgba(3,3,8,.6);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:.2s}
-  .backdrop.open{opacity:1;pointer-events:auto}
-  .sheet{position:absolute;z-index:80;left:0;right:0;bottom:0;background:var(--surface);border:1px solid var(--line);border-bottom:none;border-radius:28px 28px 0 0;padding:8px 20px calc(26px + var(--safe-b));transform:translateY(102%);transition:transform .28s cubic-bezier(.22,1,.36,1);max-height:90%;overflow-y:auto}
-  .sheet.open{transform:translateY(0)}
-  .grip{width:42px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 16px}
-  .sheet h3{font-size:18px;font-weight:700;margin-bottom:4px;letter-spacing:-.3px}
-  .sheet .hint{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5}
-
-  .seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:14px}
-  .seg button{flex:1;border:none;background:none;color:var(--muted);font-family:var(--display);font-weight:600;font-size:14px;padding:11px;border-radius:10px;cursor:pointer;transition:.15s}
-  .seg button.on-out{background:rgba(255,77,141,.16);color:var(--pink)}
-  .seg button.on-in{background:rgba(52,245,197,.16);color:var(--mint)}
-
-  .field{margin-bottom:14px}
-  .field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
-  .field input,.field select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:13px;color:var(--text);font-family:var(--display);font-size:15px;padding:13px 14px;outline:none;transition:.15s}
-  .field input:focus,.field select:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(177,78,255,.15)}
-  input[type=date]{color-scheme:dark}
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .amount-in{position:relative}
-  .amount-in .cur{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:var(--mono);color:var(--muted);font-size:15px}
-  .amount-in input{padding-left:42px;font-family:var(--mono);font-weight:700;font-size:20px}
-  .cat-pick{display:flex;gap:8px;flex-wrap:wrap}
-  .cat-pick button{background:var(--bg);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:9px 12px;font-size:13px;cursor:pointer;font-family:var(--display);display:flex;align-items:center;gap:6px;transition:.15s}
-  .cat-pick button.sel{border-color:var(--violet);color:#fff;background:rgba(177,78,255,.12)}
-  .save{width:100%;margin-top:8px;border:none;cursor:pointer;border-radius:15px;padding:16px;font-family:var(--display);font-weight:700;font-size:15.5px;color:#0B0B12;background:linear-gradient(135deg,var(--violet),var(--cyan));box-shadow:0 12px 26px -10px rgba(177,78,255,.6);transition:transform .12s}
-  .save:active{transform:scale(.98)}
-
-  .toast{position:absolute;z-index:90;left:50%;bottom:calc(104px + var(--safe-b));transform:translate(-50%,20px);background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:11px 18px;border-radius:14px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;display:flex;align-items:center;gap:9px;white-space:nowrap;box-shadow:0 16px 34px -12px rgba(0,0,0,.7)}
-  .toast.show{opacity:1;transform:translate(-50%,0)}
-  .toast .tk{color:var(--mint)}
-
-  .view{display:none;animation:fade .3s ease}
-  .view.active{display:block}
-  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-  .bars{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:20px 18px}
-  .bar-row{margin-bottom:16px}.bar-row:last-child{margin-bottom:0}
-  .bar-row .h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}
-  .bar-row .h .val{font-family:var(--mono);color:var(--muted)}
-  .track{height:9px;border-radius:6px;background:var(--bg);overflow:hidden}
-  .fill{height:100%;border-radius:6px;width:0;transition:width .8s cubic-bezier(.22,1,.36,1)}
-
-  /* ---- Linha do Tempo (só planejamento) ---- */
-  .tl-hero{position:relative;border-radius:24px;padding:20px;overflow:hidden;background:linear-gradient(150deg,#101a2b,#14141f 60%,#1a1030);border:1px solid #26314a}
-  .tl-hero .lbl{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-  .tl-hero .big{font-family:var(--mono);font-weight:700;font-size:30px;margin-top:6px;letter-spacing:-.5px}
-  .tl-hero .big.pos{color:var(--mint)}.tl-hero .big.warn{color:var(--amber)}
-  .tl-hero .foot{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5}
-
-  .mrow{background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;overflow:hidden}
-  .mrow .head{display:flex;align-items:center;gap:12px;padding:14px 15px;cursor:pointer}
-  .mrow .mo{font-family:var(--mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text);width:64px;flex:none}
-  .mrow .flow{flex:1;display:flex;gap:10px;font-family:var(--mono);font-size:11px}
-  .mrow .flow .i{color:var(--mint)}.mrow .flow .o{color:var(--pink)}
-  .mrow .chev{color:var(--muted-2);font-size:12px;transition:transform .2s;flex:none;width:14px;text-align:center}
-  .mrow.open .chev{transform:rotate(90deg)}
-  .mrow .body{max-height:0;overflow:hidden;transition:max-height .28s ease}
-  .mrow.open .body{max-height:600px}
-  .mrow .body-in{padding:2px 15px 12px;border-top:1px solid rgba(42,42,60,.55)}
-  .bi{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(42,42,60,.4)}
-  .bi:last-child{border-bottom:none}
-  .bi .bic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:14px;background:var(--surface-2);border:1px solid var(--line);flex:none}
-  .bi .bn{flex:1;font-size:13px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bi .bv{font-family:var(--mono);font-size:12.5px;font-weight:700;flex:none}
-  .bi .bv.in{color:var(--mint)}.bi .bv.out{color:var(--text)}
-  .stat-pill{font-family:var(--mono);font-size:9px;padding:4px 9px;border-radius:8px;cursor:pointer;border:1px solid var(--amber);color:var(--amber);background:rgba(255,176,32,.1);white-space:nowrap;flex:none;transition:.15s}
-  .stat-pill:active{transform:scale(.94)}
-  .stat-pill.paid{border-color:var(--mint);color:var(--mint);background:rgba(52,245,197,.14)}
-  .bi.is-paid .bn,.bi.is-paid .bic,.bi.is-paid .bv{opacity:.5}
-  .bi.is-paid .bn{text-decoration:line-through}
-  .pay-sum{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;padding:9px 0 4px;color:var(--muted)}
-  .pay-sum .pend{color:var(--amber)}.pay-sum .done{color:var(--mint)}
-
-  /* ---- Lista de planejamentos ativos (gerenciar/excluir) ---- */
-  .prow{display:flex;align-items:center;gap:13px;padding:13px 2px;border-bottom:1px solid rgba(42,42,60,.55)}
-  .prow:last-child{border-bottom:none}
-  .prow .ic{width:42px;height:42px;border-radius:13px;flex:none;display:grid;place-items:center;font-size:18px;background:var(--surface-2);border:1px solid var(--line)}
-  .prow .mid{flex:1;min-width:0}
-  .prow .nm{font-size:14.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .prow .meta{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:3px;letter-spacing:.3px}
-  .prow .pv{font-family:var(--mono);font-weight:700;font-size:14.5px;flex:none}
-  .prow .pv.in{color:var(--mint)}.prow .pv.out{color:var(--text)}
-  .prow .pdel{background:rgba(255,77,141,.12);color:var(--pink);border:1px solid rgba(255,77,141,.25);border-radius:10px;width:36px;height:36px;font-size:15px;cursor:pointer;flex:none;transition:.15s}
-  .prow .pdel:active{transform:scale(.92)}
-
-  .recur-pick{display:flex;gap:8px}
-  .recur-pick button{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:11px;font-size:13px;cursor:pointer;font-family:var(--display)}
-  .recur-pick button.sel{border-color:var(--cyan);color:#fff;background:rgba(34,211,238,.1)}
-  .count-wrap{overflow:hidden;max-height:0;transition:max-height .25s ease}
-  .count-wrap.show{max-height:90px}
-
-  /* ---- Modal de confirmação (excluir) ---- */
-  .confirm{position:absolute;z-index:95;left:50%;top:50%;transform:translate(-50%,-46%) scale(.94);width:calc(100% - 56px);max-width:320px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:24px 22px;opacity:0;pointer-events:none;transition:.2s;text-align:center;box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}
-  .confirm.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
-  .cf-ic{font-size:28px;margin-bottom:8px}
-  .cf-t{font-size:17px;font-weight:700;margin-bottom:8px}
-  .cf-m{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px}
-  .cf-a{display:flex;gap:10px}
-  .cf-b{flex:1;border:none;cursor:pointer;border-radius:13px;padding:13px;font-family:var(--display);font-weight:600;font-size:14px}
-  .cf-b.no{background:var(--surface-2);color:var(--text);border:1px solid var(--line)}
-  .cf-b.yes{background:rgba(255,77,141,.16);color:var(--pink);border:1px solid rgba(255,77,141,.35)}
-  .cf-b:active{transform:scale(.97)}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0B0B12">
+    <title>Fluxo · Controle Financeiro</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Fluxo">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<div class="stage">
-  <div class="device">
-    <div class="app">
-      <div class="scroll">
-        <div class="top">
-          <div><div class="hi-label">Bem-vindo de volta</div><div class="hi-name">Olá, Filipe 👋</div></div>
-          <div class="avatar">F</div>
-        </div>
-        <div class="month" id="monthNav">
-          <button onclick="changeMonth(-1)">‹</button>
-          <span id="monthLabel"></span>
-          <button onclick="changeMonth(1)">›</button>
-        </div>
+    <div class="stage">
+        <div class="device">
+            <div class="app">
+                <div class="scroll">
+                    <div class="top">
+                        <div><div class="hi-label">Bem-vindo de volta</div><div class="hi-name">Olá, Filipe 👋</div></div>
+                        <div class="avatar">F</div>
+                    </div>
+                    <div class="month" id="monthNav">
+                        <button onclick="changeMonth(-1)">‹</button>
+                        <span id="monthLabel"></span>
+                        <button onclick="changeMonth(1)">›</button>
+                    </div>
 
-        <!-- ===== INÍCIO (lançamentos reais) ===== -->
-        <section class="view active" id="view-inicio">
-          <div class="balance">
-            <div class="lbl">Saldo do mês</div>
-            <div class="amount" id="balanceAmt"></div>
-            <div class="sub"><span id="balanceChip" class="chip"></span><span id="balanceCmp"></span></div>
-            <div class="spark">
-              <div class="cap"><span>Evolução do saldo · real</span><span id="sparkEnd"></span></div>
-              <svg id="sparkSvg" viewBox="0 0 300 44" preserveAspectRatio="none"></svg>
+                    <!-- ===== INÍCIO (lançamentos reais) ===== -->
+                    <section class="view active" id="view-inicio">
+                        <div class="balance">
+                            <div class="lbl">Saldo do mês</div>
+                            <div class="amount" id="balanceAmt"></div>
+                            <div class="sub"><span id="balanceChip" class="chip"></span><span id="balanceCmp"></span></div>
+                            <div class="spark">
+                                <div class="cap"><span>Evolução do saldo · real</span><span id="sparkEnd"></span></div>
+                                <svg id="sparkSvg" viewBox="0 0 300 44" preserveAspectRatio="none"></svg>
+                            </div>
+                        </div>
+                        <div class="duo">
+                            <div class="stat"><div class="row"><span class="dot in"></span><span class="t">Entradas</span></div><div class="v in" id="inAmt"></div></div>
+                            <div class="stat"><div class="row"><span class="dot out"></span><span class="t">Saídas</span></div><div class="v out" id="outAmt"></div></div>
+                        </div>
+                        <div class="sec-head"><h2>Por categoria</h2><a onclick="go('categorias')">ver tudo</a></div>
+                        <div id="catsWrap"></div>
+                        <div class="sec-head"><h2>Recentes</h2><a onclick="go('transacoes')">ver todas</a></div>
+                        <div id="recentList"></div>
+                    </section>
+
+                    <!-- ===== LANÇAMENTOS ===== -->
+                    <section class="view" id="view-transacoes">
+                        <div class="sec-head"><h2>Lançamentos do mês</h2><a id="txCount"></a></div>
+                        <div id="fullList"></div>
+                    </section>
+
+                    <!-- ===== CATEGORIAS ===== -->
+                    <section class="view" id="view-categorias">
+                        <div class="sec-head"><h2>Gastos por categoria</h2><a id="catTotal"></a></div>
+                        <div id="catBars"></div>
+                    </section>
+
+                    <!-- ===== LINHA DO TEMPO (planejamento, independente) ===== -->
+                    <section class="view" id="view-timeline">
+                        
+                        <div class="sec-head"><h2>Projeção mês a mês</h2><span style="font-family:var(--mono);font-size:10px;color:var(--muted-2)">só planejamento</span></div>
+                        <div id="tlMonths"></div>
+                    </section>
+
+                    <!-- ===== PLANOS (planejamentos ativos) ===== -->
+                    <section class="view" id="view-planos">
+                        <div class="sec-head"><h2>Planejamentos ativos</h2><a onclick="openPlan()">＋ novo</a></div>
+                        <div id="planList"></div>
+                    </section>
+                </div>
+
+                <button class="fab" id="fab" onclick="fabAction()" aria-label="Novo">+</button>
+
+                <nav class="tabbar">
+                    <button class="tab active" data-tab="inicio" onclick="go('inicio')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5" /><path d="M5 10v10h14V10" /></svg><span>Início</span>
+                    </button>
+                    <button class="tab" data-tab="transacoes" onclick="go('transacoes')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h13l-3-3" /><path d="M20 17H7l3 3" /></svg><span>Lançamentos</span>
+                    </button>
+                    <button class="tab" data-tab="categorias" onclick="go('categorias')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9l6 4" /><circle cx="12" cy="12" r="9" /></svg><span>Categorias</span>
+                    </button>
+                    <button class="tab" data-tab="timeline" onclick="go('timeline')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l5-5 4 3 6-8" /><path d="M3 3v18h18" /></svg><span>Linha do tempo</span>
+                    </button>
+                    <button class="tab" data-tab="planos" onclick="go('planos')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8" /><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9" /></svg><span>Planos</span>
+                    </button>
+                </nav>
+
+                <div class="backdrop" id="backdrop" onclick="closeSheets()"></div>
+
+                <!-- Sheet: lançamento real -->
+                <div class="sheet" id="sheet">
+                    <div class="grip"></div>
+                    <h3>Novo lançamento</h3>
+                    <p class="hint">Um lançamento real — algo que já aconteceu. Não afeta o planejamento.</p>
+                    <div class="seg"><button id="segOut" class="on-out" onclick="setType('out')">Saída</button><button id="segIn" onclick="setType('in')">Entrada</button></div>
+                    <div class="field amount-in"><label>Valor</label><span class="cur">R$</span><input id="fVal" type="text" inputmode="decimal" placeholder="0,00"></div>
+                    <div class="two">
+                        <div class="field"><label>Descrição</label><input id="fDesc" type="text" placeholder="Ex.: Mercado"></div>
+                        <div class="field"><label>Data</label><input id="fDate" type="date"></div>
+                    </div>
+                    <div class="field"><label>Categoria</label><div class="cat-pick" id="catPick"></div></div>
+                    <button class="save" onclick="addTx()">Adicionar lançamento</button>
+                </div>
+
+                <!-- Sheet: planejamento -->
+                <div class="sheet" id="sheetPlan">
+                    <div class="grip"></div>
+                    <h3>Planejar na linha do tempo</h3>
+                    <p class="hint">Só previsão — não vira lançamento nem mexe no seu saldo real. Uma vez cai no mês da data início; todo mês repete no mesmo dia até o mês da data fim.</p>
+                    <div class="seg"><button id="psegOut" class="on-out" onclick="setPType('out')">Saída</button><button id="psegIn" onclick="setPType('in')">Entrada</button></div>
+                    <div class="field amount-in"><label>Valor</label><span class="cur">R$</span><input id="pVal" type="text" inputmode="decimal" placeholder="0,00"></div>
+                    <div class="two">
+                        <div class="field"><label>Descrição</label><input id="pDesc" type="text" placeholder="Ex.: Aluguel"></div>
+                        <div class="field"><label>Data de início</label><input id="pDate" type="date"></div>
+                    </div>
+                    <div class="field"><label>Categoria</label><div class="cat-pick" id="pCatPick"></div></div>
+                    <div class="field">
+                        <label>Repetição</label>
+                        <div class="recur-pick">
+                            <button id="rOnce" class="sel" onclick="setRecur('once')">Uma vez</button>
+                            <button id="rMonthly" onclick="setRecur('monthly')">Todo mês</button>
+                        </div>
+                        <div class="count-wrap" id="endWrap">
+                            <div class="field" style="margin:12px 0 0"><label>Data fim (repete até este mês)</label><input id="pEnd" type="date"></div>
+                        </div>
+                    </div>
+                    <button class="save" onclick="addPlan()">Projetar na linha do tempo</button>
+                </div>
+
+                <!-- Modal de confirmação -->
+                <div class="backdrop" id="cfBack" onclick="cfResolve(false)"></div>
+                <div class="confirm" id="cfBox">
+                    <div class="cf-ic">🗑️</div>
+                    <div class="cf-t">Tem certeza?</div>
+                    <div class="cf-m" id="cfMsg"></div>
+                    <div class="cf-a"><button class="cf-b no" onclick="cfResolve(false)">Cancelar</button><button class="cf-b yes" onclick="cfResolve(true)">Excluir</button></div>
+                </div>
+
+                <div class="toast" id="toast"><span class="tk">✓</span><span id="toastMsg"></span></div>
             </div>
-          </div>
-          <div class="duo">
-            <div class="stat"><div class="row"><span class="dot in"></span><span class="t">Entradas</span></div><div class="v in" id="inAmt"></div></div>
-            <div class="stat"><div class="row"><span class="dot out"></span><span class="t">Saídas</span></div><div class="v out" id="outAmt"></div></div>
-          </div>
-          <div class="sec-head"><h2>Por categoria</h2><a onclick="go('categorias')">ver tudo</a></div>
-          <div id="catsWrap"></div>
-          <div class="sec-head"><h2>Recentes</h2><a onclick="go('transacoes')">ver todas</a></div>
-          <div id="recentList"></div>
-        </section>
-
-        <!-- ===== LANÇAMENTOS ===== -->
-        <section class="view" id="view-transacoes">
-          <div class="sec-head"><h2>Lançamentos do mês</h2><a id="txCount"></a></div>
-          <div id="fullList"></div>
-        </section>
-
-        <!-- ===== CATEGORIAS ===== -->
-        <section class="view" id="view-categorias">
-          <div class="sec-head"><h2>Gastos por categoria</h2><a id="catTotal"></a></div>
-          <div id="catBars"></div>
-        </section>
-
-        <!-- ===== LINHA DO TEMPO (planejamento, independente) ===== -->
-        <section class="view" id="view-timeline">
-          <div class="tl-hero">
-            <div class="lbl">Planejamento · próximos 12 meses</div>
-            <div class="big" id="tlPend"></div>
-            <div class="foot" id="tlFoot"></div>
-          </div>
-          <div class="sec-head"><h2>Planejamentos ativos</h2><a onclick="openPlan()">＋ novo</a></div>
-          <div id="planList"></div>
-          <div class="sec-head"><h2>Projeção mês a mês</h2><span style="font-family:var(--mono);font-size:10px;color:var(--muted-2)">só planejamento</span></div>
-          <div id="tlMonths"></div>
-        </section>
-      </div>
-
-      <button class="fab" id="fab" onclick="fabAction()" aria-label="Novo">+</button>
-
-      <nav class="tabbar">
-        <button class="tab active" data-tab="inicio" onclick="go('inicio')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/></svg><span>Início</span></button>
-        <button class="tab" data-tab="transacoes" onclick="go('transacoes')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h13l-3-3"/><path d="M20 17H7l3 3"/></svg><span>Lançamentos</span></button>
-        <button class="tab" data-tab="categorias" onclick="go('categorias')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9l6 4"/><circle cx="12" cy="12" r="9"/></svg><span>Categorias</span></button>
-        <button class="tab" data-tab="timeline" onclick="go('timeline')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l5-5 4 3 6-8"/><path d="M3 3v18h18"/></svg><span>Linha do tempo</span></button>
-      </nav>
-
-      <div class="backdrop" id="backdrop" onclick="closeSheets()"></div>
-
-      <!-- Sheet: lançamento real -->
-      <div class="sheet" id="sheet">
-        <div class="grip"></div>
-        <h3>Novo lançamento</h3>
-        <p class="hint">Um lançamento real — algo que já aconteceu. Não afeta o planejamento.</p>
-        <div class="seg"><button id="segOut" class="on-out" onclick="setType('out')">Saída</button><button id="segIn" onclick="setType('in')">Entrada</button></div>
-        <div class="field amount-in"><label>Valor</label><span class="cur">R$</span><input id="fVal" type="text" inputmode="decimal" placeholder="0,00"></div>
-        <div class="two">
-          <div class="field"><label>Descrição</label><input id="fDesc" type="text" placeholder="Ex.: Mercado"></div>
-          <div class="field"><label>Data</label><input id="fDate" type="date"></div>
         </div>
-        <div class="field"><label>Categoria</label><div class="cat-pick" id="catPick"></div></div>
-        <button class="save" onclick="addTx()">Adicionar lançamento</button>
-      </div>
-
-      <!-- Sheet: planejamento -->
-      <div class="sheet" id="sheetPlan">
-        <div class="grip"></div>
-        <h3>Planejar na linha do tempo</h3>
-        <p class="hint">Só previsão — não vira lançamento nem mexe no seu saldo real. Uma vez cai no mês da data início; todo mês repete no mesmo dia até o mês da data fim.</p>
-        <div class="seg"><button id="psegOut" class="on-out" onclick="setPType('out')">Saída</button><button id="psegIn" onclick="setPType('in')">Entrada</button></div>
-        <div class="field amount-in"><label>Valor</label><span class="cur">R$</span><input id="pVal" type="text" inputmode="decimal" placeholder="0,00"></div>
-        <div class="two">
-          <div class="field"><label>Descrição</label><input id="pDesc" type="text" placeholder="Ex.: Aluguel"></div>
-          <div class="field"><label>Data de início</label><input id="pDate" type="date"></div>
-        </div>
-        <div class="field"><label>Categoria</label><div class="cat-pick" id="pCatPick"></div></div>
-        <div class="field"><label>Repetição</label>
-          <div class="recur-pick">
-            <button id="rOnce" class="sel" onclick="setRecur('once')">Uma vez</button>
-            <button id="rMonthly" onclick="setRecur('monthly')">Todo mês</button>
-          </div>
-          <div class="count-wrap" id="endWrap">
-            <div class="field" style="margin:12px 0 0"><label>Data fim (repete até este mês)</label><input id="pEnd" type="date"></div>
-          </div>
-        </div>
-        <button class="save" onclick="addPlan()">Projetar na linha do tempo</button>
-      </div>
-
-      <!-- Modal de confirmação -->
-      <div class="backdrop" id="cfBack" onclick="cfResolve(false)"></div>
-      <div class="confirm" id="cfBox">
-        <div class="cf-ic">🗑️</div>
-        <div class="cf-t">Tem certeza?</div>
-        <div class="cf-m" id="cfMsg"></div>
-        <div class="cf-a"><button class="cf-b no" onclick="cfResolve(false)">Cancelar</button><button class="cf-b yes" onclick="cfResolve(true)">Excluir</button></div>
-      </div>
-
-      <div class="toast" id="toast"><span class="tk">✓</span><span id="toastMsg"></span></div>
     </div>
-  </div>
-</div>
 
-<script>
-"use strict";
-/* ============================================================
-   FLUXO — controle financeiro (offline / PWA)
-
-   Organização deste script:
-     1) Armazenamento (IndexedDB)
-     2) Constantes (categorias)
-     3) Estado em memória
-     4) Utilidades (datas / formatação)
-     5) LANÇAMENTOS  — dados reais
-     6) PLANEJAMENTO — previsão (independente!)
-     7) Render das telas
-     8) Ações: adicionar / excluir / marcar pago
-     9) UI: abas, sheets, modal de confirmação, toast
-    10) Inicialização + Service Worker
-
-   REGRA DE OURO: lançamento e planejamento são mundos separados.
-   Criar ou excluir um NUNCA reflete no outro.
-   ============================================================ */
-
-/* ---------- atalho ---------- */
-const $ = id => document.getElementById(id);
-
-/* ---------- 1) Armazenamento (IndexedDB) ----------
-   3 tabelas: transactions (lançamentos), plans (planejamento),
-   payments (status pago de cada ocorrência planejada).
-   Se o IndexedDB não estiver disponível, cai para memória. */
-const DB = (() => {
-  let dbp = null, useMem = false;
-  const mem = { transactions: [], plans: [], payments: [] };
-
-  function open() {
-    if (dbp) return dbp;
-    dbp = new Promise(res => {
-      let req;
-      try { req = indexedDB.open('fluxo_db', 2); }
-      catch (e) { useMem = true; return res(null); }
-      req.onupgradeneeded = e => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains('transactions')) db.createObjectStore('transactions', { keyPath: 'id' });
-        if (!db.objectStoreNames.contains('plans'))        db.createObjectStore('plans',        { keyPath: 'id' });
-        if (!db.objectStoreNames.contains('payments'))     db.createObjectStore('payments',     { keyPath: 'key' });
-      };
-      req.onsuccess = () => res(req.result);
-      req.onerror   = () => { useMem = true; res(null); };
-    });
-    return dbp;
-  }
-  async function all(store) {
-    const db = await open();
-    if (useMem || !db) return mem[store].slice();
-    return new Promise(res => {
-      const r = db.transaction(store, 'readonly').objectStore(store).getAll();
-      r.onsuccess = () => res(r.result || []);
-      r.onerror   = () => res([]);
-    });
-  }
-  async function put(store, val) {
-    const db = await open();
-    if (useMem || !db) {
-      const key = store === 'payments' ? 'key' : 'id';
-      const i = mem[store].findIndex(x => x[key] === val[key]);
-      i >= 0 ? mem[store][i] = val : mem[store].push(val);
-      return;
-    }
-    return new Promise(res => {
-      const t = db.transaction(store, 'readwrite');
-      t.objectStore(store).put(val);
-      t.oncomplete = () => res(); t.onerror = () => res();
-    });
-  }
-  async function del(store, id) {
-    const db = await open();
-    if (useMem || !db) {
-      const key = store === 'payments' ? 'key' : 'id';
-      mem[store] = mem[store].filter(x => x[key] !== id);
-      return;
-    }
-    return new Promise(res => {
-      const t = db.transaction(store, 'readwrite');
-      t.objectStore(store).delete(id);
-      t.oncomplete = () => res(); t.onerror = () => res();
-    });
-  }
-  return { all, put, del };
-})();
-
-/* ---------- 2) Categorias ---------- */
-const CATS = {
-  'Mercado':      { emoji: '🛒', color: '#B14EFF' },
-  'Transporte':   { emoji: '🚗', color: '#22D3EE' },
-  'Lazer':        { emoji: '🎮', color: '#FF4D8D' },
-  'Contas':       { emoji: '📄', color: '#FFB020' },
-  'Moradia':      { emoji: '🏠', color: '#7C6BFF' },
-  'Saúde':        { emoji: '💊', color: '#34F5C5' },
-  'Salário':      { emoji: '💰', color: '#34F5C5' },
-  'Investimento': { emoji: '📈', color: '#22D3EE' },
-  'Outros':       { emoji: '✨', color: '#7A7A8C' }
-};
-const OUT_CATS = ['Mercado', 'Transporte', 'Lazer', 'Contas', 'Moradia', 'Saúde', 'Outros'];
-const IN_CATS  = ['Salário', 'Investimento', 'Outros'];
-
-/* ---------- 3) Estado em memória ---------- */
-let TX    = [];          // lançamentos reais
-let PLANS = [];          // planejamentos
-let PAID  = new Set();   // chaves "planId__YYYY-MM" já pagas
-
-let sheetType = 'out', sheetCat = 'Mercado';        // form de lançamento
-let pType = 'out', pCat = 'Mercado', pRecur = 'once'; // form de planejamento
-let activeLeg = null, openMonths = {}, currentTab = 'inicio';
-
-const MESES  = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
-const MCURTO = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
-const now = new Date();
-const curYM = ym(now.getFullYear(), now.getMonth() + 1);
-let viewYM = curYM;
-
-/* ---------- 4) Utilidades ---------- */
-function ym(y, m) { return y + '-' + String(m).padStart(2, '0'); }
-function todayISO() { const p = n => String(n).padStart(2, '0'); return now.getFullYear() + '-' + p(now.getMonth() + 1) + '-' + p(now.getDate()); }
-function ymOf(iso) { return iso.slice(0, 7); }
-function ymAdd(k, n) { let [y, m] = k.split('-').map(Number); const idx = y * 12 + (m - 1) + n; return ym(Math.floor(idx / 12), idx % 12 + 1); }
-function ymFull(k) { const [y, m] = k.split('-').map(Number); return MESES[m - 1] + ' ' + y; }
-function ymShort(k) { const [y, m] = k.split('-').map(Number); return MCURTO[m - 1] + '/' + String(y).slice(2); }
-function ddmm(iso) { return iso.slice(8, 10) + '/' + iso.slice(5, 7); }
-const brl = v => Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-function splitBRL(v) { const s = brl(v).split(','); return { int: s[0], cents: s[1] }; }
-const sum = a => a.reduce((s, t) => s + t.val, 0);
-function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
-function byDateDesc(a, b) { return b.date.localeCompare(a.date) || b.id - a.id; }
-
-/* ---------- 5) Cálculos — LANÇAMENTOS (dados reais) ---------- */
-function monthTx(k) { return TX.filter(t => ymOf(t.date) === k); }
-function totals(list) {
-  const i = sum(list.filter(t => t.type === 'in'));
-  const o = sum(list.filter(t => t.type === 'out'));
-  return { in: i, out: o, bal: i - o };
-}
-function byCat(list) {
-  const m = {};
-  list.filter(t => t.type === 'out').forEach(t => m[t.cat] = (m[t.cat] || 0) + t.val);
-  return Object.entries(m)
-    .map(([cat, val]) => ({ cat, val, ...(CATS[cat] || CATS.Outros) }))
-    .sort((a, b) => b.val - a.val);
-}
-// Evolução do saldo real nos últimos 8 meses (gráfico do Início)
-function realSeries() {
-  const start = ymAdd(curYM, -7);
-  let bal = sum(TX.filter(t => ymOf(t.date) < start && t.type === 'in'))
-          - sum(TX.filter(t => ymOf(t.date) < start && t.type === 'out'));
-  const months = [];
-  for (let i = 0; i < 8; i++) { const k = ymAdd(start, i); bal += totals(monthTx(k)).bal; months.push({ key: k, balance: bal }); }
-  return months;
-}
-
-/* ---------- 6) Cálculos — PLANEJAMENTO (independente!) ----------
-   Não usa nenhuma transação real. Não acumula saldo entre os meses.
-   Cada mês mostra apenas o que foi planejado para ele. */
-function occDate(startISO, k) { // dia do plano no mês k (ajusta se o dia não existir)
-  const day = Number(startISO.slice(8, 10));
-  const [y, m] = k.split('-').map(Number);
-  const last = new Date(y, m, 0).getDate();
-  return k + '-' + String(Math.min(day, last)).padStart(2, '0');
-}
-function planHits(p, k) { // o plano p aparece no mês k?
-  const s = ymOf(p.startDate);
-  if (k < s) return false;
-  if (p.recur === 'once') return k === s;
-  if (p.endDate) return k <= ymOf(p.endDate);
-  return true; // mensal sem fim (planos antigos)
-}
-function projectPlans() {
-  const months = [];
-  let totalIn = 0, totalOut = 0, pending = 0;
-  for (let i = 0; i < 12; i++) {
-    const k = ymAdd(curYM, i), items = [];
-    PLANS.forEach(p => {
-      if (!planHits(p, k)) return;
-      const pkey = p.id + '__' + k, paid = PAID.has(pkey);
-      items.push({ planId: p.id, desc: p.desc, cat: p.cat, val: p.val, type: p.type, date: occDate(p.startDate, k), pkey, paid });
-      if (p.type === 'in') totalIn += p.val;
-      else { totalOut += p.val; if (!paid) pending += p.val; }
-    });
-    months.push({
-      key: k,
-      in:  sum(items.filter(x => x.type === 'in')),
-      out: sum(items.filter(x => x.type === 'out')),
-      items
-    });
-  }
-  return { months, totalIn, totalOut, pending };
-}
-
-/* ---------- 7) Render ---------- */
-function render() {
-  $('monthLabel').textContent = ymFull(viewYM).toUpperCase();
-  const list = monthTx(viewYM), t = totals(list), b = splitBRL(t.bal);
-  $('balanceAmt').innerHTML = `<span>${t.bal < 0 ? '-' : ''}R$ ${b.int}</span><span class="cents">,${b.cents}</span>`;
-
-  // comparativo com o mês anterior
-  const prev = totals(monthTx(ymAdd(viewYM, -1))), chip = $('balanceChip');
-  if (prev.bal !== 0) {
-    const d = Math.round((t.bal - prev.bal) / Math.abs(prev.bal) * 100);
-    chip.textContent = (d >= 0 ? '▲ ' : '▼ ') + Math.abs(d) + '%';
-    chip.className = 'chip' + (d >= 0 ? '' : ' neg');
-    $('balanceCmp').textContent = 'vs. mês anterior';
-  } else {
-    chip.textContent = '—'; chip.className = 'chip';
-    $('balanceCmp').textContent = 'sem base anterior';
-  }
-
-  $('inAmt').textContent  = 'R$ ' + brl(t.in);
-  $('outAmt').textContent = 'R$ ' + brl(t.out);
-
-  renderSpark();
-  renderCats(list);
-  renderList('recentList', list.slice().sort(byDateDesc).slice(0, 4), false);
-  renderList('fullList',   list.slice().sort(byDateDesc), true);
-  $('txCount').textContent = list.length + ' itens';
-  renderBars(list);
-  renderTimeline();
-}
-
-function renderSpark() {
-  const pts = realSeries().map(m => m.balance);
-  const min = Math.min(...pts, 0), max = Math.max(...pts, 0), rng = (max - min) || 1;
-  const W = 300, H = 44, P = 4;
-  const co = pts.map((p, i) => [P + (i / (pts.length - 1)) * (W - 2 * P), H - P - ((p - min) / rng) * (H - 2 * P)]);
-  const line = co.map((c, i) => (i ? 'L' : 'M') + c[0].toFixed(1) + ' ' + c[1].toFixed(1)).join(' ');
-  $('sparkSvg').innerHTML =
-    `<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22D3EE" stop-opacity=".35"/><stop offset="100%" stop-color="#22D3EE" stop-opacity="0"/></linearGradient></defs>
-     <path d="${line} L${W - P} ${H} L${P} ${H} Z" fill="url(#sg)"/>
-     <path d="${line}" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-     <circle cx="${co[co.length - 1][0].toFixed(1)}" cy="${co[co.length - 1][1].toFixed(1)}" r="3.5" fill="#22D3EE"/>`;
-  $('sparkEnd').textContent = 'hoje R$ ' + brl(pts[pts.length - 1]);
-}
-
-function renderCats(list) {
-  const data = byCat(list), total = sum(data), wrap = $('catsWrap');
-  if (!data.length) { wrap.innerHTML = `<div class="cats"><div class="empty" style="width:100%"><div class="em">📊</div><p>Sem gastos neste mês ainda.</p></div></div>`; return; }
-  const R = 54, C = 66, circ = 2 * Math.PI * R;
-  let off = 0, svg = `<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#1D1D2B" stroke-width="16"/>`;
-  data.forEach((d, i) => {
-    const len = d.val / total * circ, dim = (activeLeg !== null && activeLeg !== i);
-    svg += `<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${d.color}" stroke-width="16" stroke-dasharray="${len} ${circ - len}" stroke-dashoffset="${-off}" opacity="${dim ? .25 : 1}" style="transition:opacity .2s"/>`;
-    off += len;
-  });
-  const show = activeLeg !== null ? data[activeLeg] : data[0];
-  wrap.innerHTML =
-    `<div class="cats">
-      <div class="donut">
-        <svg width="132" height="132" viewBox="0 0 132 132" style="transform:rotate(-90deg)">${svg}</svg>
-        <div class="center"><div class="pct">${Math.round(show.val / total * 100)}%</div><div class="nm">${esc(show.cat)}</div></div>
-      </div>
-      <div class="legend">${data.map((d, i) => `
-        <div class="leg ${activeLeg === i ? 'active' : ''} ${activeLeg !== null && activeLeg !== i ? 'dim' : ''}" onclick="toggleLeg(${i})">
-          <span class="ld" style="background:${d.color}"></span>
-          <span class="ln">${d.emoji} ${esc(d.cat)}</span>
-          <span class="lv">R$ ${brl(d.val)}</span>
-        </div>`).join('')}
-      </div>
-    </div>`;
-}
-function toggleLeg(i) { activeLeg = (activeLeg === i) ? null : i; renderCats(monthTx(viewYM)); }
-
-function renderList(elId, items, deletable) {
-  const el = $(elId);
-  if (!items.length) { el.innerHTML = `<div class="empty"><div class="em">🌙</div><p>Nenhum lançamento em ${ymFull(viewYM).toLowerCase()}.<br>Toque no <b>+</b> pra registrar.</p></div>`; return; }
-  el.innerHTML = items.map(t => {
-    const c = CATS[t.cat] || CATS.Outros;
-    return `<div class="tx" data-id="${t.id}" ${deletable ? 'onclick="toggleDel(this)"' : ''}>
-      <div class="ic">${c.emoji}</div>
-      <div class="mid"><div class="nm">${esc(t.desc)}</div><div class="meta">${esc(t.cat)} · ${ddmm(t.date)}</div></div>
-      <div class="amt ${t.type}">${t.type === 'in' ? '+' : '−'} R$ ${brl(t.val)}</div>
-      ${deletable ? `<button class="del" onclick="event.stopPropagation();delTx(${t.id})">✕</button>` : ''}
-    </div>`;
-  }).join('');
-}
-function toggleDel(row) {
-  const was = row.classList.contains('show-del');
-  document.querySelectorAll('.tx.show-del').forEach(r => r.classList.remove('show-del'));
-  if (!was) row.classList.add('show-del');
-}
-
-function renderBars(list) {
-  const data = byCat(list), max = Math.max(...data.map(d => d.val), 1), total = sum(data);
-  $('catTotal').textContent = 'R$ ' + brl(total);
-  const el = $('catBars');
-  if (!data.length) { el.innerHTML = `<div class="bars"><div class="empty"><div class="em">📊</div><p>Sem gastos neste mês.</p></div></div>`; return; }
-  el.innerHTML = `<div class="bars">${data.map(d => `
-    <div class="bar-row">
-      <div class="h"><span>${d.emoji} ${esc(d.cat)}</span><span class="val">R$ ${brl(d.val)}</span></div>
-      <div class="track"><div class="fill" style="background:${d.color}" data-w="${(d.val / max * 100).toFixed(1)}"></div></div>
-    </div>`).join('')}</div>`;
-  requestAnimationFrame(() => requestAnimationFrame(() => el.querySelectorAll('.fill').forEach(f => f.style.width = f.dataset.w + '%')));
-}
-
-/* ----- Render da Linha do Tempo (só planejamento) ----- */
-function renderTimeline() {
-  const { months, totalIn, totalOut, pending } = projectPlans();
-
-  const pend = $('tlPend');
-  pend.textContent = 'R$ ' + brl(pending);
-  pend.className = 'big' + (pending > 0 ? ' warn' : ' pos');
-  $('tlFoot').innerHTML = `A pagar (pendente) · ${PLANS.length} planejamento(s)<br>saídas previstas R$ ${brl(totalOut)} · entradas R$ ${brl(totalIn)}`;
-
-  renderPlanList();
-
-  $('tlMonths').innerHTML = months.map(m => {
-    const op = openMonths[m.key] ? 'open' : '';
-    const pendVal = m.items.filter(x => x.type === 'out' && !x.paid).reduce((s, x) => s + x.val, 0);
-    const paidCount = m.items.filter(x => x.paid).length;
-    const summary = m.items.length
-      ? `<div class="pay-sum"><span>${m.items.length} item(ns) · ${paidCount} pago(s)</span><span class="${pendVal > 0 ? 'pend' : 'done'}">${pendVal > 0 ? 'falta R$ ' + brl(pendVal) : 'tudo pago ✓'}</span></div>`
-      : '';
-    const items = m.items.length
-      ? m.items.map(it => {
-          const c = CATS[it.cat] || CATS.Outros;
-          return `<div class="bi ${it.paid ? 'is-paid' : ''}">
-            <div class="bic">${c.emoji}</div>
-            <div class="bn">${esc(it.desc)} <span style="color:var(--muted-2);font-family:var(--mono);font-size:10px">· ${ddmm(it.date)}</span></div>
-            <span class="stat-pill ${it.paid ? 'paid' : ''}" onclick="event.stopPropagation();togglePaid('${it.pkey}')">${it.paid ? '✓ Pago' : 'Pendente'}</span>
-            <div class="bv ${it.type}">${it.type === 'in' ? '+' : '−'} R$ ${brl(it.val)}</div>
-          </div>`;
-        }).join('')
-      : `<div class="empty" style="padding:16px"><p>Nada planejado neste mês.</p></div>`;
-    return `<div class="mrow ${op}">
-      <div class="head" onclick="toggleMonth('${m.key}')">
-        <div class="mo">${ymShort(m.key)}</div>
-        <div class="flow"><span class="i">+${brl(m.in)}</span><span class="o">−${brl(m.out)}</span></div>
-        <div class="chev">▶</div>
-      </div>
-      <div class="body"><div class="body-in">${summary}${items}</div></div>
-    </div>`;
-  }).join('');
-}
-
-// Lista de planejamentos ativos (onde se exclui um plano inteiro)
-function planPeriodText(p) {
-  const dd = p.startDate.slice(8, 10) + '/' + p.startDate.slice(5, 7) + '/' + p.startDate.slice(0, 4);
-  if (p.recur === 'once') return 'Uma vez · ' + dd;
-  const fim = p.endDate ? ymShort(ymOf(p.endDate)) : 'sem fim';
-  return 'Todo dia ' + p.startDate.slice(8, 10) + ' · ' + ymShort(ymOf(p.startDate)) + ' → ' + fim;
-}
-function renderPlanList() {
-  const el = $('planList');
-  if (!PLANS.length) { el.innerHTML = `<div class="empty" style="padding:26px 20px"><div class="em">🗓️</div><p>Nenhum planejamento ainda.<br>Toque em <b>＋ novo</b> para criar.</p></div>`; return; }
-  el.innerHTML = PLANS.slice().sort((a, b) => a.startDate.localeCompare(b.startDate)).map(p => {
-    const c = CATS[p.cat] || CATS.Outros;
-    return `<div class="prow">
-      <div class="ic">${c.emoji}</div>
-      <div class="mid"><div class="nm">${esc(p.desc)}</div><div class="meta">${planPeriodText(p)}</div></div>
-      <div class="pv ${p.type}">${p.type === 'in' ? '+' : '−'} R$ ${brl(p.val)}</div>
-      <button class="pdel" onclick="delPlan(${p.id})" aria-label="Excluir">🗑️</button>
-    </div>`;
-  }).join('');
-}
-
-/* ---------- 8) Ações: adicionar / excluir / marcar pago ---------- */
-function parseVal(id) { const raw = $(id).value.replace(/\./g, '').replace(',', '.'); return parseFloat(raw); }
-
-async function addTx() {
-  const val = parseVal('fVal'); if (!val || val <= 0) { toast('Informe um valor válido'); return; }
-  const desc = $('fDesc').value.trim() || sheetCat;
-  const date = $('fDate').value || todayISO();
-  const item = { id: Date.now(), type: sheetType, desc, cat: sheetCat, val, date };
-  await DB.put('transactions', item);
-  TX.push(item); activeLeg = null; viewYM = ymOf(date);
-  render(); closeSheets();
-  toast((sheetType === 'in' ? 'Entrada' : 'Saída') + ' de R$ ' + brl(val) + ' registrada');
-}
-
-async function delTx(id) {
-  const t = TX.find(x => x.id === id); if (!t) return;
-  const ok = await confirmDelete(`"${t.desc}" (R$ ${brl(t.val)}) será removido dos lançamentos. Isso não afeta o planejamento.`);
-  if (!ok) return;
-  await DB.del('transactions', id);
-  TX = TX.filter(x => x.id !== id);
-  render(); toast('Lançamento removido');
-}
-
-async function addPlan() {
-  const val = parseVal('pVal'); if (!val || val <= 0) { toast('Informe um valor válido'); return; }
-  const desc = $('pDesc').value.trim() || pCat;
-  const startDate = $('pDate').value || todayISO();
-  let endDate = null;
-  if (pRecur === 'monthly') {
-    endDate = $('pEnd').value || null;
-    if (!endDate) { toast('Informe a data fim'); return; }
-    if (ymOf(endDate) < ymOf(startDate)) { toast('A data fim deve ser depois do início'); return; }
-  }
-  const item = { id: Date.now(), type: pType, desc, cat: pCat, val, startDate, recur: pRecur, endDate };
-  await DB.put('plans', item);
-  PLANS.push(item);
-  render(); closeSheets();
-  toast(pRecur === 'monthly'
-    ? `Planejado de ${ddmm(startDate)} até ${ymShort(ymOf(endDate))} ✨`
-    : 'Planejado na linha do tempo ✨');
-}
-
-async function delPlan(id) {
-  const p = PLANS.find(x => x.id === id); if (!p) return;
-  const ok = await confirmDelete(`"${p.desc}" e todas as ocorrências futuras saem do planejamento. Seus lançamentos reais não são afetados.`);
-  if (!ok) return;
-  // remove também os status de "pago" desse plano
-  for (const k of [...PAID].filter(k => k.startsWith(id + '__'))) { PAID.delete(k); await DB.del('payments', k); }
-  PLANS = PLANS.filter(x => x.id !== id);
-  await DB.del('plans', id);
-  render(); toast('Planejamento excluído');
-}
-
-async function togglePaid(pkey) {
-  if (PAID.has(pkey)) { PAID.delete(pkey); await DB.del('payments', pkey); toast('Marcado como pendente'); }
-  else { PAID.add(pkey); await DB.put('payments', { key: pkey, paidAt: todayISO() }); toast('Pago ✓'); }
-  renderTimeline();
-}
-function toggleMonth(k) { openMonths[k] = !openMonths[k]; renderTimeline(); }
-
-/* ---------- 9) UI: abas / sheets / confirmação / toast ---------- */
-function go(tab) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  $('view-' + tab).classList.add('active');
-  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  $('monthNav').style.display = (tab === 'timeline') ? 'none' : 'flex'; // navegação de mês só nas telas reais
-  currentTab = tab;
-  document.querySelector('.scroll').scrollTo({ top: 0, behavior: 'smooth' });
-}
-function changeMonth(d) { viewYM = ymAdd(viewYM, d); activeLeg = null; render(); }
-
-// O botão + cria lançamento nas telas reais e planejamento na linha do tempo
-function fabAction() { currentTab === 'timeline' ? openPlan() : openSheet(); }
-
-function openSheet() {
-  $('backdrop').classList.add('open'); $('sheet').classList.add('open');
-  setType('out'); $('fVal').value = ''; $('fDesc').value = ''; $('fDate').value = todayISO();
-  setTimeout(() => $('fVal').focus(), 300);
-}
-function openPlan() {
-  go('timeline');
-  $('backdrop').classList.add('open'); $('sheetPlan').classList.add('open');
-  setPType('out'); setRecur('once');
-  $('pVal').value = ''; $('pDesc').value = ''; $('pEnd').value = ''; $('pDate').value = todayISO();
-  setTimeout(() => $('pVal').focus(), 300);
-}
-function closeSheets() {
-  $('backdrop').classList.remove('open'); $('sheet').classList.remove('open'); $('sheetPlan').classList.remove('open');
-}
-
-function setType(t) {
-  sheetType = t;
-  $('segOut').className = t === 'out' ? 'on-out' : '';
-  $('segIn').className  = t === 'in'  ? 'on-in'  : '';
-  fillCats('catPick', t, c => { sheetCat = c; }, () => sheetCat);
-}
-function setPType(t) {
-  pType = t;
-  $('psegOut').className = t === 'out' ? 'on-out' : '';
-  $('psegIn').className  = t === 'in'  ? 'on-in'  : '';
-  fillCats('pCatPick', t, c => { pCat = c; }, () => pCat);
-}
-function fillCats(elId, type, set, get) {
-  const listc = type === 'out' ? OUT_CATS : IN_CATS; set(listc[0]);
-  $(elId).innerHTML = listc.map(c => `<button class="${c === get() ? 'sel' : ''}" data-c="${c}">${CATS[c].emoji} ${c}</button>`).join('');
-  document.querySelectorAll('#' + elId + ' button').forEach(b => b.onclick = () => {
-    set(b.dataset.c);
-    document.querySelectorAll('#' + elId + ' button').forEach(x => x.classList.remove('sel'));
-    b.classList.add('sel');
-  });
-}
-function setRecur(r) {
-  pRecur = r;
-  $('rOnce').className = r === 'once' ? 'sel' : '';
-  $('rMonthly').className = r === 'monthly' ? 'sel' : '';
-  $('endWrap').className = 'count-wrap' + (r === 'monthly' ? ' show' : '');
-}
-
-// Modal de confirmação — retorna Promise<boolean>
-let _cfResolve = null;
-function confirmDelete(msg) {
-  return new Promise(res => {
-    _cfResolve = res;
-    $('cfMsg').textContent = msg;
-    $('cfBack').classList.add('open');
-    $('cfBox').classList.add('open');
-  });
-}
-function cfResolve(v) {
-  $('cfBack').classList.remove('open');
-  $('cfBox').classList.remove('open');
-  const r = _cfResolve; _cfResolve = null;
-  if (r) r(v);
-}
-
-let toastT;
-function toast(msg) {
-  $('toastMsg').textContent = msg;
-  $('toast').classList.add('show');
-  clearTimeout(toastT);
-  toastT = setTimeout(() => $('toast').classList.remove('show'), 2200);
-}
-
-// máscara de valor (R$) nos dois formulários
-['fVal', 'pVal'].forEach(id => $(id).addEventListener('input', e => {
-  const v = e.target.value.replace(/\D/g, '');
-  e.target.value = v ? (parseInt(v, 10) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
-}));
-
-/* ---------- 10) Inicialização ---------- */
-async function boot() {
-  TX    = await DB.all('transactions');
-  PLANS = await DB.all('plans');
-  PAID  = new Set((await DB.all('payments')).map(p => p.key));
-  $('fDate').value = todayISO();
-  $('pDate').value = todayISO();
-  render();
-}
-boot();
-
-/* ---------- Service Worker (offline + atualização automática) ----------
-   Quando você publica uma versão nova no GitHub e abre o app online,
-   ele detecta, aplica na hora (skipWaiting) e recarrega uma vez. */
-if ('serviceWorker' in navigator) {
-  let reloaded = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!reloaded) { reloaded = true; location.reload(); }
-  });
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.addEventListener('updatefound', () => {
-        const nw = reg.installing;
-        if (nw) nw.addEventListener('statechange', () => {
-          if (nw.state === 'installed' && navigator.serviceWorker.controller) nw.postMessage('skipWaiting');
-        });
-      });
-    }).catch(() => {});
-  });
-}
-</script>
+    <script  src="js/store.js"></script>
+    <script  src="js/utils.js"></script>
+    <script  src="js/data.js"></script>
+    <script  src="js/ui.js"></script>
+    <script  src="js/app.js"></script>
 </body>
 </html>
